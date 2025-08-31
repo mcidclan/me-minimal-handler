@@ -22,18 +22,21 @@ CFLAGS = -I. -I$(PSPSDK)/include -I/usr/local/pspdev/psp/sdk/include -Ofast -G0 
 
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -std=c++11
 ASFLAGS = $(CFLAGS) -x assembler-with-cpp
-LDFLAGS = -L. -L$(PSPSDK)/lib -L/usr/local/pspdev/psp/sdk/lib \
-          -lpsppower -lpspdebug -lpspdisplay -lpspge -lpspctrl \
-          -lpspsdk -lc -lpspnet -lpspnet_inet -lpspnet_apctl \
-          -lpspnet_resolver -lpsputility -lpspuser -lpspkernel
 
+LDFLAGS = -L. -L$(PSPSDK)/lib -L/usr/local/pspdev/psp/sdk/lib \
+          -Wl,-zmax-page-size=128 -Wl,-q
+
+LIBS = -lpspdebug -lpspdisplay -lpspge -lpspctrl \
+       -lpspnet -lpspnet_apctl -lpspsdk -lpspkernel -lpspuser \
+       -lpsppower -lc
+       
 PSP_EBOOT_SFO = $(BINOUT)PARAM.SFO
 PSP_EBOOT_TITLE = Minimal Me Handler
 
 all: $(TARGET).elf $(BINOUT)EBOOT.PBP
 
 $(TARGET).elf: $(OBJS)
-	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
+	$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@ $(LIBS)
 
 $(PATHOBJS)%.o: $(PATHSRC)%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
